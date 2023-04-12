@@ -100,6 +100,13 @@ namespace IdentityServer4.AspNetIdentity
         protected virtual async Task GetProfileDataAsync(ProfileDataRequestContext context, TUser user)
         {
             var principal = await GetUserClaimsAsync(user);
+            foreach (var claim in principal.Claims)
+            {
+                //TODO: Не смог заставить фреймворк прокидывать роль в веб-клиент.
+                //Надо разобраться и тогда можно вообще отключить свою реализацию ProfileService
+                if (claim.Type == "role") 
+                    context.IssuedClaims.Add(claim);
+            }
             context.AddRequestedClaims(principal.Claims);
         }
 

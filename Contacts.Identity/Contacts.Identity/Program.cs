@@ -50,9 +50,13 @@ services.AddIdentity<AppUser, IdentityRole>(config =>
     config.Password.RequireUppercase = false;
 }).AddEntityFrameworkStores<AuthDbContext>().AddDefaultTokenProviders();
 
+var identyBuilder = services.AddIdentityServer()
+    .AddAspNetIdentity<AppUser>();
 
-services.AddIdentityServer()
-    .AddAspNetIdentity<AppUser>().AddConfigurationStore(options =>
+identyBuilder.Services.RemoveAll(typeof(IProfileService));
+
+identyBuilder.AddProfileService<MyProfileService<AppUser>>()
+    .AddConfigurationStore(options =>
     {
         options.ConfigureDbContext = builder => builder.UseSqlite(connectionString,
            opt => opt.MigrationsAssembly(migrationsAssembly));
@@ -67,8 +71,6 @@ services.AddIdentityServer()
     .AddDeveloperSigningCredential();
 
 services.AddControllersWithViews();
-
-
 
 var app = builder.Build();
 

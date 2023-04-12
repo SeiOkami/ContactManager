@@ -11,8 +11,10 @@ namespace Contacts.Identity.Models
 {
     public static class ExtensionsModel
     {
-        public async static Task<AppUser> AddNewUserAsync(this UserManager<AppUser> userManager,
-            string userName, string fullName, string email, string password, string id = "")
+        public async static Task<AppUser> AddNewUserAsync(
+            this UserManager<AppUser> userManager,
+            string userName, string fullName, string email, 
+            string password, string id = "")
         {
 
             var user = new AppUser
@@ -46,5 +48,6 @@ namespace Contacts.Identity.Models
             return user;
 
         }
+
     }
 }

@@ -2,6 +2,7 @@ using Contacts.WebClient.Services;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using System.IdentityModel.Tokens.Jwt;
 using Contacts.WebClient;
+using System.Security.Claims;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -26,12 +27,9 @@ services.AddAuthentication(options =>
         options.ResponseType = "code";
         options.UsePkce = true;
         options.ResponseMode = "query";
-
-        options.Scope.Add(Configuration.ApiScopeName);
-        
         options.SaveTokens = true;
 
-        options.TokenValidationParameters.RoleClaimType = "role";
+        options.Scope.Add(Configuration.ApiScopeName);
 
     });
 

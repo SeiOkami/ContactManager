@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Contacts.WebClient.Extensions;
+using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
 
 namespace Contacts.WebClient.Controllers
@@ -22,5 +23,8 @@ namespace Contacts.WebClient.Controllers
                 return result;
             }
         }
+
+        internal bool IsAdmin => User.IsAdmin();
+    
     }
 }
