@@ -69,6 +69,19 @@ namespace Contacts.WebClient.Extensions
 
         //
         // Summary:
+        //     Is Admin
+        //
+        // Parameters:
+        //   principal:
+        //     The principal.
+        [DebuggerStepThrough]
+        public static bool IsAdmin(this ClaimsPrincipal principal)
+        {
+            return principal?.IsInRole(Configuration.RoleAdmin) ?? false;
+        }
+
+        //
+        // Summary:
         //     Gets the name.
         //
         // Parameters:

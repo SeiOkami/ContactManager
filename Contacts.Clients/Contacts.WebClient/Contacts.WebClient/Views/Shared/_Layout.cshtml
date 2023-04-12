@@ -2,6 +2,7 @@
 
 @{
     var name = Context.User?.GetDisplayName();
+    var isAdmin = Context.User?.IsAdmin() ?? false;
     var auth = !String.IsNullOrEmpty(name);
 }
 
@@ -40,6 +41,12 @@
                         <li class="nav-item dropdown">
                             <a href="#" class="nav-link">@name</a>
                         </li>
+                        @if (isAdmin)
+                        {
+                            <li class="nav-item dropdown" style="background-color:indianred">
+                                <a href="#" class="nav-link">is admin</a>
+                            </li>
+                        }
                         <li>
                             <a class="nav-link" asp-action="Logout" asp-controller="Account">Logout</a>
                         </li>

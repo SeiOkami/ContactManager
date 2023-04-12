@@ -64,7 +64,11 @@ namespace Contacts.Identity.Data
 
             if (userManager.Users.Any())
                 return;
-            
+
+            var admin = userManager.AddNewUserAsync("admin", "admin",
+                "admin@email.com", "admin", "CDA016F3-2632-4977-829F-8A45F06DB71C").Result;
+            userManager.AddToRoleAsync(admin, Configuration.AdminRoleName).Wait();
+
             userManager.AddNewUserAsync("alice", "Alice Smith",
                     "AliceSmith@email.com", "Pass123$", "20480835-FAA6-4495-8A7C-29E7CE175888").Wait();
 
