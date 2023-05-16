@@ -4,23 +4,27 @@
     {
         public string MainURL { get; set; } = String.Empty;
 
-        public string ListMethodName { get; set; } = String.Empty;
-        public string DetailsMethodName { get; set; } = String.Empty;
-        public string CreateMethodName { get; set; } = String.Empty;
-        public string UpdateMethodName { get; set; } = String.Empty;
-        public string DeleteMethodName { get; set; } = String.Empty;
-        public string ClearMethodName { get; set; } = String.Empty;
-        public string GenerateMethodName { get; set; } = String.Empty;
-        public string ImportMethodName { get; set; } = String.Empty;
+        public string ListContactsMethodName { get; set; } = String.Empty;
+        public string DetailsContactMethodName { get; set; } = String.Empty;
+        public string CreateContactMethodName { get; set; } = String.Empty;
+        public string UpdateContactMethodName { get; set; } = String.Empty;
+        public string DeleteContactMethodName { get; set; } = String.Empty;
+        public string ClearContactsMethodName { get; set; } = String.Empty;
+        public string GenerateContactsMethodName { get; set; } = String.Empty;
+        public string ImportContactsMethodName { get; set; } = String.Empty;
+        public string ListUsersMethodName { get; set; } = String.Empty;
+        public string GetUserMethodName { get; set; } = String.Empty;
 
-        public string ListMethodURL { get => MainURL + ListMethodName; }
-        public string DetailsMethodURL { get => MainURL + DetailsMethodName; }
-        public string CreateMethodURL { get => MainURL + CreateMethodName; }
-        public string UpdateMethodURL { get => MainURL + UpdateMethodName; }
-        public string DeleteMethodURL { get => MainURL + DeleteMethodName; }
-        public string ClearMethodURL { get => MainURL + ClearMethodName; }
-        public string GenerateMethodURL { get => MainURL + GenerateMethodName; }
-        public string ImportMethodURL { get => MainURL + ImportMethodName; }
+        public string ListContactsMethodURL { get => MainURL + ListContactsMethodName; }
+        public string DetailsContactMethodURL { get => MainURL + DetailsContactMethodName; }
+        public string CreateContactMethodURL { get => MainURL + CreateContactMethodName; }
+        public string UpdateContactMethodURL { get => MainURL + UpdateContactMethodName; }
+        public string DeleteContactMethodURL { get => MainURL + DeleteContactMethodName; }
+        public string ClearContactsMethodURL { get => MainURL + ClearContactsMethodName; }
+        public string GenerateContactsMethodURL { get => MainURL + GenerateContactsMethodName; }
+        public string ImportContactsMethodURL { get => MainURL + ImportContactsMethodName; }
+        public string ListUsersMethodURL { get => MainURL + ListUsersMethodName; }
+        public string GetUserMethodURL { get => MainURL + GetUserMethodName; }
 
     }
 }

@@ -27,6 +27,8 @@ namespace Contacts.Identity.Models
             if (!String.IsNullOrEmpty(id))
                 user.Id = id;
 
+            user.Id = user.Id.ToUpper();
+
             var thisResult = await userManager.CreateAsync(user, password);
             if (!thisResult.Succeeded)
                 throw new Exception(thisResult.Errors.First().Description);

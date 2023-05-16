@@ -1,0 +1,40 @@
+﻿@using Contacts.WebClient.Models
+@model List<UserModel>
+
+@{
+    var title = "Users list";
+    ViewData["Title"] = title;
+    UserModel userView = new();
+}
+
+<h1 class="display-4">@title</h1>
+
+<table class="table table-condensed table-striped table-bordered">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => userView.Name)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => userView.Id)
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Name)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Id)
+                </td>
+                <td>
+                    @Html.ActionLink("Contacts", "", "", new {  userId = item.Id })
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

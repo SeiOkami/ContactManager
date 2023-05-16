@@ -29,6 +29,12 @@ namespace Contacts.WebApi
 
             var services = builder.Services;
 
+            services.AddHttpClient("IdentityServer", client =>
+            {
+                client.BaseAddress = new Uri(Configuration.IdentityServerUrl);
+            });
+
+            services.AddHttpClient<IdentityServerService>("IdentityServer");
 
             services.AddAutoMapper(config =>
             {
@@ -56,7 +62,7 @@ namespace Contacts.WebApi
                 config.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
             }).AddJwtBearer("Bearer", options =>
             {
-                options.Authority = "https://localhost:7251";
+                options.Authority = Configuration.IdentityServerUrl;
                 options.Audience = "ContactsWebAPI";
                 options.RequireHttpsMetadata = false;
             });

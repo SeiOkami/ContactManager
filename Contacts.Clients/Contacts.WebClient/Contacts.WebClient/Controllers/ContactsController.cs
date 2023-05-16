@@ -3,6 +3,7 @@ using Contacts.WebClient.Services;
 using IdentityModel.Client;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System.Text;
@@ -23,20 +24,23 @@ namespace Contacts.WebClient.Controllers
             _webAPI = webAPI;
         }
 
+        //[HttpGet("{userId?}")]
         [HttpGet()]
         [Authorize]
-        public async Task<ActionResult> Index()
+        public async Task<ActionResult> Index([FromQuery]Guid? userId)
         {
-            //ContactsModel? contacts;
-            try
+            if (userId == null || !IsAdmin)
+                userId = UserId;
+
+            var contacts = await _webAPI.ListContacts(HttpContext, userId);
+
+            if (contacts != null)
             {
-                var contacts = await _webAPI.ListContacts(HttpContext);
-                return View(contacts);
+                contacts.IsThisUser = (userId == UserId);
+                contacts.User = await _webAPI.GetUser(HttpContext, (Guid)userId);
             }
-            catch
-            {
-                return RedirectToAction("Logout", "Account");
-            }
+
+            return View(contacts);
         }
 
         [Authorize]

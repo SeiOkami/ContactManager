@@ -19,12 +19,16 @@ namespace Contacts.WebClient.Services
             this.Settings = options.Value;
         }        
 
-        public async Task<ContactsModel?> ListContacts(HttpContext сontext)
+        public async Task<ContactsModel?> ListContacts(HttpContext сontext, Guid? userID)
         {
             
             using var httpClient = await NewHttpClient(сontext);
 
-            var result = await httpClient.GetAsync(Settings.ListMethodURL);
+            var fullPath = Settings.ListContactsMethodURL;
+            if (userID != null)
+                fullPath = $"{fullPath}/{userID}";
+
+            var result = await httpClient.GetAsync(fullPath);
             if (result.IsSuccessStatusCode)
                 return (ContactsModel?)(await result.Content.ReadFromJsonAsync(typeof(ContactsModel)));
             else
@@ -36,7 +40,7 @@ namespace Contacts.WebClient.Services
         {
             using var httpClient = await NewHttpClient(сontext);
 
-            var result = await httpClient.GetAsync(Settings.ListMethodURL);
+            var result = await httpClient.GetAsync(Settings.ListContactsMethodURL);
             if (result.IsSuccessStatusCode)
             {
                 return await result.Content.ReadAsStreamAsync();
@@ -53,7 +57,7 @@ namespace Contacts.WebClient.Services
             
             var json = JsonConvert.SerializeObject(contact);
             var data = new StringContent(json, Encoding.UTF8, "application/json");
-            var result = await httpClient.PostAsync(Settings.CreateMethodURL, data);
+            var result = await httpClient.PostAsync(Settings.CreateContactMethodURL, data);
 
             if (!result.IsSuccessStatusCode)
                 throw new Exception(result.ToString());
@@ -73,7 +77,7 @@ namespace Contacts.WebClient.Services
         {
             using var httpClient = await NewHttpClient(сontext);
 
-            var fullURL = Settings.UpdateMethodURL;
+            var fullURL = Settings.UpdateContactMethodURL;
 
             var json = JsonConvert.SerializeObject(contact);
             var data = new StringContent(json, Encoding.UTF8, "application/json");
@@ -87,7 +91,7 @@ namespace Contacts.WebClient.Services
         {
             using var httpClient = await NewHttpClient(сontext);
 
-            var fullURL = $"{Settings.DetailsMethodURL}{ID}";
+            var fullURL = $"{Settings.DetailsContactMethodURL}/{ID}";
 
             var result = await httpClient.GetAsync(fullURL);
             if (result.IsSuccessStatusCode)
@@ -100,7 +104,7 @@ namespace Contacts.WebClient.Services
         {
             using var httpClient = await NewHttpClient(сontext);
 
-            var fullURL = $"{Settings.DeleteMethodURL}{ID}";
+            var fullURL = $"{Settings.DeleteContactMethodURL}/{ID}";
 
             var result = await httpClient.DeleteAsync(fullURL);
 
@@ -112,7 +116,7 @@ namespace Contacts.WebClient.Services
         {
             using var httpClient = await NewHttpClient(сontext);
 
-            var result = await httpClient.DeleteAsync(Settings.ClearMethodURL);
+            var result = await httpClient.DeleteAsync(Settings.ClearContactsMethodURL);
 
             if (!result.IsSuccessStatusCode)
                 throw new Exception(result.ToString());
@@ -122,7 +126,7 @@ namespace Contacts.WebClient.Services
         {
             using var httpClient = await NewHttpClient(сontext);
 
-            var result = await httpClient.PostAsync(Settings.GenerateMethodURL, null);
+            var result = await httpClient.PostAsync(Settings.GenerateContactsMethodURL, null);
 
             if (!result.IsSuccessStatusCode)
                 throw new Exception(result.ToString());
@@ -142,11 +146,37 @@ namespace Contacts.WebClient.Services
 
             var content = new StringContent(contacts.ToString(), Encoding.UTF8, "application/json");
 
-            var result = await httpClient.PostAsync(Settings.ImportMethodURL, content);
+            var result = await httpClient.PostAsync(Settings.ImportContactsMethodURL, content);
 
             if (!result.IsSuccessStatusCode)
                 throw new Exception(result.ToString());
 
-    }
+        }
+
+        public async Task<List<UserModel>?> ListUsers(HttpContext сontext)
+        {
+
+            using var httpClient = await NewHttpClient(сontext);
+
+            var result = await httpClient.GetAsync(Settings.ListUsersMethodURL);
+            if (result.IsSuccessStatusCode)
+                return (List<UserModel>?)(await result.Content.ReadFromJsonAsync(typeof(List<UserModel>)));
+            else
+                throw new Exception(result.ToString());
+
+        }
+
+        public async Task<UserModel?> GetUser(HttpContext сontext, Guid Id)
+        {
+
+            using var httpClient = await NewHttpClient(сontext);
+            var fullURL = $"{Settings.GetUserMethodURL}/{Id}";
+            var result = await httpClient.GetAsync(fullURL);
+            if (result.IsSuccessStatusCode)
+                return (UserModel?)(await result.Content.ReadFromJsonAsync(typeof(UserModel)));
+            else
+                throw new Exception(result.ToString());
+
+        }
     }
 }

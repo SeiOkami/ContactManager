@@ -12,7 +12,7 @@ namespace Contacts.Identity
     {
 
         public static readonly string UserRoleName = "User";
-        public static readonly string AdminRoleName = "Admin";
+        public const string AdminRoleName = "Admin";
         public static readonly string ApiScopeName = "ContactsWebAPI";
         public static readonly string ClientName = "ContactsWebAPI";
         public static readonly string ApiResourceName = "ContactsWebAPI";

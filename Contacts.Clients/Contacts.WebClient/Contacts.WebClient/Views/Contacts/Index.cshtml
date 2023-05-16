@@ -2,24 +2,40 @@
 @model Contacts.WebClient.Models.ContactsModel
 
 @{
+    var isAdmin = Context.User?.IsAdmin() ?? false; 
+
     var title = "Contact list";
+    if (isAdmin)
+        title += $" user {Model.User?.Name}";
+
     ViewData["Title"] = title;
+    
     ContactModel contactView = new();
 }
+
 
 <h1 class="display-4">@title</h1>
 
 <div class="menu-panel">
     <div class="text-left">
-        <a asp-action="Create">Add</a>
+        @if (isAdmin)
+        {
+            <a asp-controller="Users">Select user</a>
+        }
+        @if (Model.IsThisUser)
+        {
+            <a asp-action="Create">Add</a>
+            <a asp-action="Import">Import</a>
+        }
         <a asp-action="Export">Export</a>
-        <a asp-action="Import">Import</a>
     </div>
     <div class="text-right">
         <a asp-action="Index">Update</a>
-        <a asp-action="Generate">Generate</a>
-        <a asp-action="Clear">Clear</a>
-        
+        @if (Model.IsThisUser)
+        {
+            <a asp-action="Generate">Generate</a>
+            <a asp-action="Clear">Clear</a>
+        }
     </div>
 </div>
 
