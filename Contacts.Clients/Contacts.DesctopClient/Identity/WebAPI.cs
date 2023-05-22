@@ -92,7 +92,7 @@ namespace Contacts.DesctopClient.Identity
         {
             using var httpClient = new HttpClientAPI(User.Token);
 
-            var response = await httpClient.GetAsync(settings.ListMethodURL);
+            var response = await httpClient.GetAsync(settings.ListContactsMethodURL);
 
             if (response.IsSuccessStatusCode)
                 return (ContactsModel?)(await response.Content.ReadFromJsonAsync(typeof(ContactsModel)));
@@ -106,7 +106,7 @@ namespace Contacts.DesctopClient.Identity
         {
             using var httpClient = new HttpClientAPI(User.Token);
 
-            var fullURL = $"{settings.DetailsMethodURL}{ID}";
+            var fullURL = $"{settings.DetailsContactMethodURL}{ID}";
 
             var response = await httpClient.GetAsync(fullURL);
             if (response.IsSuccessStatusCode)
@@ -120,7 +120,7 @@ namespace Contacts.DesctopClient.Identity
         {
             using var httpClient = new HttpClientAPI(User.Token);
 
-            var fullURL = settings.UpdateMethodURL;
+            var fullURL = settings.UpdateContactMethodURL;
 
             var json = JsonConvert.SerializeObject(contact);
             var data = new StringContent(json, Encoding.UTF8, "application/json");
@@ -136,7 +136,7 @@ namespace Contacts.DesctopClient.Identity
 
             var json = JsonConvert.SerializeObject(contact);
             var data = new StringContent(json, Encoding.UTF8, "application/json");
-            var response = await httpClient.PostAsync(settings.CreateMethodURL, data);
+            var response = await httpClient.PostAsync(settings.CreateContactMethodURL, data);
 
             if (response.IsSuccessStatusCode)
                 return (Guid?)(await response.Content.ReadFromJsonAsync(typeof(Guid?)));
@@ -149,7 +149,7 @@ namespace Contacts.DesctopClient.Identity
         {
             using var httpClient = new HttpClientAPI(User.Token);
 
-            var fullURL = $"{settings.DeleteMethodURL}{ID}";
+            var fullURL = $"{settings.DeleteContactMethodURL}{ID}";
 
             var response = await httpClient.DeleteAsync(fullURL);
 
@@ -164,7 +164,7 @@ namespace Contacts.DesctopClient.Identity
         {
             using var httpClient = new HttpClientAPI(User.Token);
 
-            var response = await httpClient.GetAsync(settings.ListMethodURL);
+            var response = await httpClient.GetAsync(settings.ListContactsMethodURL);
             if (response.IsSuccessStatusCode)
                 return await response.Content.ReadAsStreamAsync();
 
@@ -176,7 +176,7 @@ namespace Contacts.DesctopClient.Identity
         {
             using var httpClient = new HttpClientAPI(User.Token);
 
-            var response = await httpClient.DeleteAsync(settings.ClearMethodURL);
+            var response = await httpClient.DeleteAsync(settings.ClearContactsMethodURL);
             if (!response.IsSuccessStatusCode)
                 HandleResponseError(response);
 
@@ -186,7 +186,7 @@ namespace Contacts.DesctopClient.Identity
         {
             using var httpClient = new HttpClientAPI(User.Token);
 
-            var response = await httpClient.PostAsync(settings.GenerateMethodURL, null);
+            var response = await httpClient.PostAsync(settings.GenerateContactsMethodURL, null);
 
             if (!response.IsSuccessStatusCode)
                 HandleResponseError(response);
@@ -199,7 +199,7 @@ namespace Contacts.DesctopClient.Identity
 
             var content = new StringContent(data, Encoding.UTF8, "application/json");
 
-            var response = await httpClient.PostAsync(settings.ImportMethodURL, content);
+            var response = await httpClient.PostAsync(settings.ImportContactsMethodURL, content);
 
             if (!response.IsSuccessStatusCode)
                 HandleResponseError(response);
