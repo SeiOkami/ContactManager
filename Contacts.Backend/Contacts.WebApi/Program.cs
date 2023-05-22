@@ -14,6 +14,7 @@ using Contacts.WebApi.Services;
 using Microsoft.Extensions.Options;
 using Swashbuckle.AspNetCore.SwaggerGen;
 using Microsoft.AspNetCore.Mvc.ApiExplorer;
+using Polly;
 
 namespace Contacts.WebApi
 
@@ -23,6 +24,23 @@ namespace Contacts.WebApi
 
         public static void Main(string[] args)
         {
+
+            var identityUrl = Configuration.IdentityServerUrl;
+
+            Policy.Handle<Exception>()
+                .WaitAndRetryAsync(
+                    retryCount: 20,
+                    sleepDurationProvider: retryAttempt => TimeSpan.FromSeconds(1),
+                    onRetry: (exception, retryCount) =>
+                    {
+                        Console.WriteLine($"Retry {retryCount} due to {exception.Message}");
+                    })
+                .ExecuteAsync(async () =>
+                {
+                    using var client = new HttpClient();
+                    var response = await client.GetAsync(identityUrl);
+                    response.EnsureSuccessStatusCode();
+                }).Wait();
 
             var builder = WebApplication.CreateBuilder(args);
             builder.Host.UseSerilog();
