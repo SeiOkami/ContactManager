@@ -73,7 +73,7 @@ namespace Contacts.Identity.Data
                     "AliceSmith@email.com", "Pass123$", "20480835-FAA6-4495-8A7C-29E7CE175888").Wait();
 
             userManager.AddNewUserAsync("bob", "Bob Smith",
-                "BobSmith@email.com", "Pass123$", "ca257d10-1615-4b8e-92d8-38366ae805b0").Wait();
+                "BobSmith@email.com", "Pass123$", "CA257D10-1615-4B8E-92D8-38366AE805B0").Wait();
 
             Log.Debug("test users created");
 

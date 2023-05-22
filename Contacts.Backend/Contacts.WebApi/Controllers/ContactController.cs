@@ -17,11 +17,11 @@ namespace Contacts.WebApi.Controllers
     [ApiVersionNeutral]
     [Produces("application/json")]
     [Route("api/[controller]")]
-    public class ContactController : BaseController
+    public class ContactsController : BaseController
     {
         private readonly IMapper _mapper;
 
-        public ContactController(IMapper mapper) => _mapper = mapper;
+        public ContactsController(IMapper mapper) => _mapper = mapper;
 
         /// <summary>
         /// Gets the list of contacts
@@ -35,17 +35,45 @@ namespace Contacts.WebApi.Controllers
         /// </returns>
         /// <response code="200">Success</response>
         /// <response code="401">If the user is unauthorized</response>
-        [HttpGet]
+        [HttpGet("GetAll/{userId?}")]
         [Authorize]
-        public async Task<ActionResult<ContactListVm>> GetAll()
+        public async Task<ActionResult<ContactListVm>> GetAll(Guid? userId)
         {
+            if (userId == null || !IsAdmin)
+                userId = UserId;
+
             var query = new GetContactListQuery
             {
-                UserId = UserId
+                UserId = (Guid)userId
             };
             var vm = await Mediator.Send(query);
             return Ok(vm);
         }
+
+        /// <summary>
+        /// Gets the list of contacts
+        /// </summary>
+        /// <remarks>
+        /// Sample request:
+        /// GET /contact
+        /// </remarks>
+        /// <param name="userID">user ID (guid)</param>
+        /// <returns>
+        /// Returns ContactListVm
+        /// </returns>
+        /// <response code="200">Success</response>
+        /// <response code="401">If the user is unauthorized</response>
+        //[HttpGet]
+        //[Authorize(Roles = Configuration.RoleNameAdmin)]
+        //public async Task<ActionResult<ContactListVm>> GetAll1(Guid userID)
+        //{
+        //    var query = new GetContactListQuery
+        //    {
+        //        UserId = UserId
+        //    };
+        //    var vm = await Mediator.Send(query);
+        //    return Ok(vm);
+        //}
 
         /// <summary>
         /// Gets the contact by id
@@ -58,7 +86,7 @@ namespace Contacts.WebApi.Controllers
         /// <returns>Returns ContactDetailsVm</returns>
         /// <response code="200">Success</response>
         /// <response code="401">If the user in unauthorized</response>
-        [HttpGet("{id}")]
+        [HttpGet("Get/{id}")]
         [Authorize]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
@@ -88,7 +116,7 @@ namespace Contacts.WebApi.Controllers
         /// <returns>Returns id (guid)</returns>
         /// <response code="201">Success</response>
         /// <response code="401">If the user is unauthorized</response>
-        [HttpPost]
+        [HttpPost("Create")]
         [Authorize]
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
@@ -114,7 +142,7 @@ namespace Contacts.WebApi.Controllers
         /// <returns>Returns NoContent</returns>
         /// <response code="204">Success</response>
         /// <response code="401">If the user is unauthorized</response>
-        [HttpPut]
+        [HttpPut("Update")]
         [Authorize]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
@@ -137,7 +165,7 @@ namespace Contacts.WebApi.Controllers
         /// <returns>Returns NoContent</returns>
         /// <response code="204">Success</response>
         /// <response code="401">If the user is unauthorized</response>
-        [HttpDelete("{id}")]
+        [HttpDelete("Delete/{id}")]
         [Authorize]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
@@ -163,7 +191,7 @@ namespace Contacts.WebApi.Controllers
         /// <returns>Returns NoContent</returns>
         /// <response code="204">Success</response>
         /// <response code="401">If the user is unauthorized</response>
-        [HttpDelete("clear")]
+        [HttpDelete("Clear")]
         [Authorize]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
@@ -188,7 +216,7 @@ namespace Contacts.WebApi.Controllers
         /// <returns>Returns NoContent</returns>
         /// <response code="204">Success</response>
         /// <response code="401">If the user is unauthorized</response>
-        [HttpPost("generate")]
+        [HttpPost("Generate")]
         [Authorize]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
@@ -214,7 +242,7 @@ namespace Contacts.WebApi.Controllers
         /// <returns>Returns NoContent</returns>
         /// <response code="204">Success</response>
         /// <response code="401">If the user is unauthorized</response>
-        [HttpPost("import")]
+        [HttpPost("Import")]
         [Authorize]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]

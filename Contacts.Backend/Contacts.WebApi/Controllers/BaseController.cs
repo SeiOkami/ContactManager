@@ -16,6 +16,8 @@ namespace Contacts.WebApi.Controllers
         protected IMediator Mediator =>
             _mediator ??= HttpContext.RequestServices.GetService<IMediator>() ?? null!;
 
+        internal bool IsAdmin => User?.IsInRole(Configuration.RoleNameAdmin) ?? false;
+
         internal Guid UserId
         {
             get
