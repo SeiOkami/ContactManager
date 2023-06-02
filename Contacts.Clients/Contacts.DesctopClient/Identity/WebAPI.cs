@@ -1,19 +1,19 @@
 ﻿using Contacts.DesctopClient.Models;
-using IdentityModel.Client;
 using IdentityModel.OidcClient;
 using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json;
 using System;
-using System.Collections.Generic;
-using System.ComponentModel;
 using System.IO;
-using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Json;
-using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Threading;
+using System.Linq;
+using System.Security.Claims;
+using System.Windows.Documents;
+using System.Collections.Generic;
 
 namespace Contacts.DesctopClient.Identity
 {
@@ -22,7 +22,7 @@ namespace Contacts.DesctopClient.Identity
 
         private OidcClient oidcClient;
 
-        public UserModel User;
+        public IdentityUserModel User;
 
         private readonly string userCancelKeyError = "UserCancel";
         private readonly string accessDeniedKeyError = "access_denied";
@@ -58,10 +58,57 @@ namespace Contacts.DesctopClient.Identity
             oidcClient = new OidcClient(options);
         }
 
+        
+        public void CheckConnection()
+        {
+            int count = 20;
+            int delay = 1000;
+
+            using var client = new HttpClient();
+
+            do
+            {
+                try
+                {
+                    client.GetAsync("https://localhost:7058/").Wait();
+                }
+                catch
+                {
+                    Thread.Sleep(delay);
+                }
+            } while (count-- > 0);
+        }
+
         public async Task LoginAsync()
         {
             if (User.IsAuthenticated)
-                return;
+            {
+                var userInfo = await oidcClient.GetUserInfoAsync(User.Token);
+                if (userInfo.IsError)
+                {
+                    User.IsAuthenticated = false;
+                } else
+                {
+                    foreach (var claim in userInfo.Claims)
+                    {
+                        if (claim.Type == "sub")
+                        {
+                            Guid id1 = Guid.NewGuid();
+                            if (claim != null)
+                                if (Guid.TryParse(claim.Value, out id1))
+                                    User.Id = id1;
+                        }
+                        else if (claim.Type == "role" && claim.Value == "Admin")
+                        {
+                            User.IsAdmin = true;
+                        }
+                    }
+
+                    return;
+                }
+                
+            }
+               
 
             User.InProcessAuthenticated = true;
 
@@ -73,6 +120,18 @@ namespace Contacts.DesctopClient.Identity
                 User.Token = result.AccessToken;
                 User.Name = result.User?.Identity?.Name;
                 User.IsAuthenticated = result.User?.Identity?.IsAuthenticated ?? false;
+                User.IsAdmin = result.User?.IsInRole("Admin") ?? false;
+
+                if (result.User != null && result.User.Identity != null
+                    && result.User.Identity.IsAuthenticated)
+                {
+                    Guid id = Guid.NewGuid();
+                    var claim = result.User.FindFirst("sub");
+                    if (claim != null)
+                        if (Guid.TryParse(claim.Value, out id))
+                            User.Id = id;
+                }
+
                 error = result.Error;
             }
             catch (Exception)
@@ -88,11 +147,26 @@ namespace Contacts.DesctopClient.Identity
             User.InProcessAuthenticated = false;
         }
 
-        public async Task<ContactsModel?> ListContactsAsync()
+        public async Task<List<UserModel>?> ListUsersAsync()
         {
             using var httpClient = new HttpClientAPI(User.Token);
 
-            var response = await httpClient.GetAsync(settings.ListContactsMethodURL);
+            var response = await httpClient.GetAsync(settings.ListUsersMethodURL);
+
+            if (response.IsSuccessStatusCode)
+                return (List<UserModel>?)(await response.Content.ReadFromJsonAsync(typeof(List<UserModel>)));
+
+            HandleResponseError(response);
+            return null;
+
+        }
+
+        public async Task<ContactsModel?> ListContactsAsync(Guid UserId)
+        {
+            using var httpClient = new HttpClientAPI(User.Token);
+
+            var fullURL = $"{settings.ListContactsMethodURL}/{UserId}";
+            var response = await httpClient.GetAsync(fullURL);
 
             if (response.IsSuccessStatusCode)
                 return (ContactsModel?)(await response.Content.ReadFromJsonAsync(typeof(ContactsModel)));
@@ -106,7 +180,7 @@ namespace Contacts.DesctopClient.Identity
         {
             using var httpClient = new HttpClientAPI(User.Token);
 
-            var fullURL = $"{settings.DetailsContactMethodURL}{ID}";
+            var fullURL = $"{settings.DetailsContactMethodURL}/{ID}";
 
             var response = await httpClient.GetAsync(fullURL);
             if (response.IsSuccessStatusCode)
@@ -149,7 +223,7 @@ namespace Contacts.DesctopClient.Identity
         {
             using var httpClient = new HttpClientAPI(User.Token);
 
-            var fullURL = $"{settings.DeleteContactMethodURL}{ID}";
+            var fullURL = $"{settings.DeleteContactMethodURL}/{ID}";
 
             var response = await httpClient.DeleteAsync(fullURL);
 

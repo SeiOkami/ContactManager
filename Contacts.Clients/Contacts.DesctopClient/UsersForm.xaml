@@ -1,0 +1,46 @@
+﻿<Window x:Class="Contacts.DesctopClient.UsersForm"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:Contacts.DesctopClient"
+        xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
+        mc:Ignorable="d"  WindowStartupLocation="CenterScreen"
+        Title="UsersForm" Height="300" Width="400">
+
+    <Window.Resources>
+        <ResourceDictionary Source="Styles.xaml" />
+    </Window.Resources>
+
+    <Grid>
+        <DataGrid x:Name="Users"
+                    Grid.Row="1"
+                    IsSynchronizedWithCurrentItem="True"
+                    SelectionMode="Single" 
+                    AutoGenerateColumns="False" 
+                    ItemsSource="{Binding Users}"
+                    IsReadOnly="true">
+
+            <i:Interaction.Triggers>
+                <i:EventTrigger EventName="MouseDoubleClick">
+                    <i:InvokeCommandAction 
+                            Command="{Binding SelectUserCommand}"
+                            CommandParameter="{Binding ElementName=Users, Path=SelectedItem}" />
+                </i:EventTrigger>
+            </i:Interaction.Triggers>
+
+            <DataGrid.Columns>
+
+                <DataGridTextColumn x:Name="Name" 
+                                    Binding="{Binding Name}" 
+                                    Header="Name"/>
+
+                <DataGridTextColumn x:Name="Id" 
+                                    Binding="{Binding Id}" 
+                                    Header="Id"/>
+
+            </DataGrid.Columns>
+
+        </DataGrid>
+    </Grid>
+</Window>

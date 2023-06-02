@@ -3,8 +3,24 @@ using Microsoft.AspNetCore.Authentication.Cookies;
 using System.IdentityModel.Tokens.Jwt;
 using Contacts.WebClient;
 using System.Security.Claims;
+using Polly;
 
 var builder = WebApplication.CreateBuilder(args);
+
+Policy.Handle<Exception>()
+    .WaitAndRetryAsync(
+        retryCount: 20,
+        sleepDurationProvider: retryAttempt => TimeSpan.FromSeconds(1),
+        onRetry: (exception, retryCount) =>
+        {
+            Console.WriteLine($"Retry {retryCount} due to {exception.Message}");
+        })
+    .ExecuteAsync(async () =>
+    {
+        using var client = new HttpClient();
+        var response = await client.GetAsync("https://localhost:7058/");
+        response.EnsureSuccessStatusCode();
+    }).Wait();
 
 var services = builder.Services;
 var configuration = builder.Configuration;

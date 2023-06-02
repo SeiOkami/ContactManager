@@ -1,5 +1,6 @@
 ﻿using Contacts.DesctopClient.Identity;
 using Contacts.DesctopClient.Models;
+using IdentityModel.OidcClient;
 using Microsoft.Win32;
 using System;
 using System.Collections.Generic;
@@ -28,8 +29,14 @@ namespace Contacts.DesctopClient.ViewModels
         }
 
         public WebAPI WebAPI { get; set; }
-        public UserModel User => WebAPI.User;
+        public IdentityUserModel User => WebAPI.User;
+        public UserModel? SelectedUser;
+        public bool SelectThisUser => SelectedUser == null || !User.IsAdmin || SelectedUser.Id == User.Id;
+        public Guid SelectedUserId => SelectThisUser ? User.Id : SelectedUser?.Id ?? User.Id;
+        public string SelectedUserName => (SelectThisUser ? User.Name : SelectedUser?.Name ?? User.Name) ?? "";
+
         public bool Available { get => User.IsAuthenticated && !User.InProcessAuthenticated; }
+        public Visibility AdminPanelVisibility => User.IsAdmin ? Visibility.Visible : Visibility.Hidden;
 
         public RelayCommand UpdateCommand { get; }
         public RelayCommand ImportCommand { get; }
@@ -41,10 +48,14 @@ namespace Contacts.DesctopClient.ViewModels
         public RelayCommand CreateCommand { get; }
         public RelayCommand DeleteCommand { get; }
         public RelayCommand EditCommand { get; }
+        public RelayCommand UsersCommand { get; }
+        public RelayCommand SelectUserCommand { get; }
 
         public ApplicationViewModel()
         {
             WebAPI = new();
+            WebAPI.CheckConnection();
+
             contacts = new();
             
             LoginCommand = new(LoginCommandExecute, LoginCommandCanExecute);
@@ -52,21 +63,25 @@ namespace Contacts.DesctopClient.ViewModels
                 "Are you sure you want to logout?");
 
             UpdateCommand = new(UpdateCommandExecute, AvailableCommandCanExecute);
-            ImportCommand = new(ImportCommandExecute, AvailableCommandCanExecute);
+            ImportCommand = new(ImportCommandExecute, ReadOnlyCanExecute);
             ExportCommand = new(ExportCommandExecute, AvailableCommandCanExecute);
 
-            ClearCommand = new(ClearCommandExecute, AvailableCommandCanExecute,
+            ClearCommand = new(ClearCommandExecute, ReadOnlyCanExecute,
                 "Are you sure you want to clear all contacts?");
             
-            GenerateCommand = new(GenerateCommandExecute, AvailableCommandCanExecute,
+            GenerateCommand = new(GenerateCommandExecute, ReadOnlyCanExecute,
                 "Are you sure you want to generate test contacts?");
 
-            CreateCommand = new(CreateCommandExecute, AvailableCommandCanExecute);
-            EditCommand   = new(EditCommandExecute, AvailableCommandCanExecute);
-            DeleteCommand = new(DeleteCommandExecute, AvailableCommandCanExecute,
+            CreateCommand = new(CreateCommandExecute, ReadOnlyCanExecute);
+            EditCommand   = new(EditCommandExecute, ReadOnlyCanExecute);
+            DeleteCommand = new(DeleteCommandExecute, ReadOnlyCanExecute,
                 "Are you sure you want to delete contact?");
 
-            UpdateCommandExecute();
+            UsersCommand = new(UsersCommandExecute, UsersCommandCanExecute);
+
+            SelectUserCommand = new(SelectUserCommandExecute, AvailableCommandCanExecute);
+
+            Initialize();
         }
 
         public async void CreateCommandExecute()
@@ -87,6 +102,34 @@ namespace Contacts.DesctopClient.ViewModels
 
             Contacts.Add(contact);
         }
+        public async void UsersCommandExecute()
+        {
+            var users = await WebAPI.ListUsersAsync();
+            if (users == null)
+                return;
+
+            var view = new UsersViewModel(this, users);
+            var form = new UsersForm(view);
+            form.ShowDialog();
+
+        }
+
+        public void SelectUserCommandExecute(object? param)
+        {
+            if (param == null)
+                return;
+
+            SelectedUser = (UserModel)param;
+            OnPropertyChanged(nameof(SelectedUserName));
+            OnPropertyChanged(nameof(SelectThisUser));
+            UpdateCommandExecute();
+        }
+        
+        public bool UsersCommandCanExecute()
+        {
+            return User.IsAuthenticated && User.IsAdmin && AvailableCommandCanExecute();
+        }
+
 
         public async void DeleteCommandExecute(object? param)
         {
@@ -130,6 +173,13 @@ namespace Contacts.DesctopClient.ViewModels
                 contact.Fill(contactBase);
         }
 
+        public async void Initialize()
+        {
+            
+            await WebAPI.LoginAsync();
+            UpdateCommandExecute();
+        }
+
         public async void UpdateCommandExecute()
         {
             ObservableCollection<ContactModel>? newContacts = null;
@@ -137,7 +187,7 @@ namespace Contacts.DesctopClient.ViewModels
             {
                 try
                 {
-                    newContacts = (await WebAPI.ListContactsAsync())?.Contacts;
+                    newContacts = (await WebAPI.ListContactsAsync(SelectedUserId))?.Contacts;
                 }
                 catch
                 {
@@ -147,6 +197,9 @@ namespace Contacts.DesctopClient.ViewModels
             }                
             
             Contacts = newContacts ?? new();
+
+            OnPropertyChanged("AdminPanelVisibility");
+
         }
 
         public bool AvailableCommandCanExecute()
@@ -207,6 +260,16 @@ namespace Contacts.DesctopClient.ViewModels
 
             UpdateCommandExecute();
         }
+        
+        public bool ReadOnlyCanExecute()
+        {
+            return AvailableCommandCanExecute() && SelectThisUser;
+        }
+        public bool ReadOnlyCanExecute(object? param)
+        {
+            return AvailableCommandCanExecute(param) && SelectThisUser;
+        }
+
         public async void ClearCommandExecute()
         {
             
@@ -224,7 +287,7 @@ namespace Contacts.DesctopClient.ViewModels
         public async void LoginCommandExecute()
         {
             await WebAPI.LoginAsync();
-            
+
             UpdateCommandExecute();
         }
 
