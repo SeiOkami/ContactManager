@@ -31,8 +31,8 @@
                     <Grid>
 
                         <Grid.ColumnDefinitions>
-                            <ColumnDefinition/>
-                            <ColumnDefinition/>
+                            <ColumnDefinition Width="70*"/>
+                            <ColumnDefinition Width="30*"/>
                         </Grid.ColumnDefinitions>
 
                         <Menu Grid.Column="0"
@@ -60,7 +60,7 @@
                                     <Image Source="Resources/Open.ico"/>
                                 </MenuItem.Icon>
                             </MenuItem>
-                            
+
                             <MenuItem Header="Export" 
                                       HorizontalAlignment="Left"
                                       Command="{Binding ExportCommand}">
@@ -83,6 +83,20 @@
                                 <MenuItem.Icon>
                                     <Image Source="Resources/Delete.ico"/>
                                 </MenuItem.Icon>
+                            </MenuItem>
+
+                            <MenuItem Header="Select user" 
+                                      HorizontalAlignment="Left"
+                                      Command="{Binding UsersCommand}"
+                                      Visibility="{Binding AdminPanelVisibility}">
+                                <MenuItem.Icon>
+                                    <Image Source="Resources/Profile.ico"/>
+                                </MenuItem.Icon>
+                            </MenuItem>
+
+                            <MenuItem Header="{Binding SelectedUserName}" 
+                                      HorizontalAlignment="Left"
+                                      Visibility="{Binding AdminPanelVisibility}">
                             </MenuItem>
 
                         </Menu>
@@ -136,20 +150,24 @@
 
 
                     </Grid>
-                    
+
                 </Border>
 
             </Grid>
 
 
             <Grid Grid.Row="1">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="173*"/>
+                    <ColumnDefinition Width="27*"/>
+                </Grid.ColumnDefinitions>
 
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto"/>
                     <RowDefinition Height="*"/>
                 </Grid.RowDefinitions>
 
-                <Menu Grid.Row="0">
+                <Menu Grid.Row="0" Grid.ColumnSpan="2">
 
                     <MenuItem Header="New"
                               Command="{Binding CreateCommand}">
@@ -175,12 +193,11 @@
                 </Menu>
 
                 <DataGrid x:Name="Contacts"
-                    Grid.Row="1"
                     IsSynchronizedWithCurrentItem="True"
                     SelectionMode="Single" 
                     AutoGenerateColumns="False" 
                     ItemsSource="{Binding Contacts}"
-                    IsReadOnly="true">
+                    IsReadOnly="true" Grid.ColumnSpan="2" Margin="0,35,0,0" Grid.RowSpan="2">
 
                     <i:Interaction.Triggers>
                         <i:EventTrigger EventName="MouseDoubleClick">
