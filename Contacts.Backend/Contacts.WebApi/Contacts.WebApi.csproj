@@ -24,6 +24,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\Contacts.Shared\Contacts.Shared.csproj" />
     <ProjectReference Include="..\Contacts.Application\Contacts.Application.csproj" />
     <ProjectReference Include="..\Contacts.Persistence\Contacts.Persistence.csproj" />
   </ItemGroup>
