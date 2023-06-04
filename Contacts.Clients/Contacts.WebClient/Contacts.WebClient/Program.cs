@@ -4,23 +4,17 @@ using System.IdentityModel.Tokens.Jwt;
 using Contacts.WebClient;
 using System.Security.Claims;
 using Polly;
+using Contacts.Shared.LaunchManager;
 
 var builder = WebApplication.CreateBuilder(args);
 
-Policy.Handle<Exception>()
-    .WaitAndRetryAsync(
-        retryCount: 20,
-        sleepDurationProvider: retryAttempt => TimeSpan.FromSeconds(1),
-        onRetry: (exception, retryCount) =>
-        {
-            Console.WriteLine($"Retry {retryCount} due to {exception.Message}");
-        })
-    .ExecuteAsync(async () =>
-    {
-        using var client = new HttpClient();
-        var response = await client.GetAsync("https://localhost:7058/");
-        response.EnsureSuccessStatusCode();
-    }).Wait();
+LaunchManagerOptions launchManagerOptions = new()
+{
+    ExpectedAddress = "https://localhost:7058/"
+};
+
+var launch = new LaunchManager(launchManagerOptions);
+launch.OnStart();
 
 var services = builder.Services;
 var configuration = builder.Configuration;

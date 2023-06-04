@@ -58,27 +58,6 @@ namespace Contacts.DesctopClient.Identity
             oidcClient = new OidcClient(options);
         }
 
-        
-        public void CheckConnection()
-        {
-            int count = 20;
-            int delay = 1000;
-
-            using var client = new HttpClient();
-
-            do
-            {
-                try
-                {
-                    client.GetAsync("https://localhost:7058/").Wait();
-                }
-                catch
-                {
-                    Thread.Sleep(delay);
-                }
-            } while (count-- > 0);
-        }
-
         public async Task LoginAsync()
         {
             if (User.IsAuthenticated)

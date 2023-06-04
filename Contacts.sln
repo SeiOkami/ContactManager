@@ -25,6 +25,10 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Contacts.WebClient", "Conta
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Contacts.DesctopClient", "Contacts.Clients\Contacts.DesctopClient\Contacts.DesctopClient.csproj", "{28A5130D-7BAA-4144-9F77-32F78EFCD155}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Contacts.Shared", "Contacts.Shared", "{E81211F7-ECBC-4666-A45A-B42226E30A4F}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Contacts.Shared", "Contacts.Shared\Contacts.Shared.csproj", "{6C42A875-42EE-4CAE-8019-EB9E206560B7}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -67,6 +71,10 @@ Global
 		{28A5130D-7BAA-4144-9F77-32F78EFCD155}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{28A5130D-7BAA-4144-9F77-32F78EFCD155}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{28A5130D-7BAA-4144-9F77-32F78EFCD155}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6C42A875-42EE-4CAE-8019-EB9E206560B7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6C42A875-42EE-4CAE-8019-EB9E206560B7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6C42A875-42EE-4CAE-8019-EB9E206560B7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6C42A875-42EE-4CAE-8019-EB9E206560B7}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -81,6 +89,7 @@ Global
 		{D8E4A280-5FAD-47AD-9947-5246184BB5B5} = {745D7E4C-6E15-4AA6-B81C-3E8A45F38C8B}
 		{3AB079EF-BFF8-4623-917A-1B6DC5EBF9A7} = {36597966-1644-4FEA-989B-9C71653E1442}
 		{28A5130D-7BAA-4144-9F77-32F78EFCD155} = {36597966-1644-4FEA-989B-9C71653E1442}
+		{6C42A875-42EE-4CAE-8019-EB9E206560B7} = {E81211F7-ECBC-4666-A45A-B42226E30A4F}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {D44298F7-A489-4916-83ED-7F13900C3D0B}

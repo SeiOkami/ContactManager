@@ -29,18 +29,25 @@ namespace Contacts.WebClient.Controllers
         [Authorize]
         public async Task<ActionResult> Index([FromQuery]Guid? userId)
         {
-            if (userId == null || !IsAdmin)
-                userId = UserId;
-
-            var contacts = await _webAPI.ListContacts(HttpContext, userId);
-
-            if (contacts != null)
+            try
             {
-                contacts.IsThisUser = (userId == UserId);
-                contacts.User = await _webAPI.GetUser(HttpContext, (Guid)userId);
-            }
+                if (userId == null || !IsAdmin)
+                    userId = UserId;
 
-            return View(contacts);
+                var contacts = await _webAPI.ListContacts(HttpContext, userId);
+
+                if (contacts != null)
+                {
+                    contacts.IsThisUser = (userId == UserId);
+                    contacts.User = await _webAPI.GetUser(HttpContext, (Guid)userId);
+                }
+
+                return View(contacts);
+            }
+            catch
+            {
+                return RedirectToAction("Logout", "Account");
+            }
         }
 
         [Authorize]

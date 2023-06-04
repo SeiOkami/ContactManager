@@ -1,5 +1,6 @@
 ﻿using Contacts.DesctopClient.Identity;
 using Contacts.DesctopClient.Models;
+using Contacts.Shared.LaunchManager;
 using IdentityModel.OidcClient;
 using Microsoft.Win32;
 using System;
@@ -54,7 +55,12 @@ namespace Contacts.DesctopClient.ViewModels
         public ApplicationViewModel()
         {
             WebAPI = new();
-            WebAPI.CheckConnection();
+
+            var launch = new LaunchManager(
+                new() {
+                    ExpectedAddress = "https://localhost:7058/"
+                });
+            launch.OnStart();
 
             contacts = new();
             

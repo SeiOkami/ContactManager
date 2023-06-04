@@ -46,6 +46,10 @@
 	</ItemGroup>
 
 	<ItemGroup>
+	  <ProjectReference Include="..\..\Contacts.Shared\Contacts.Shared.csproj" />
+	</ItemGroup>
+
+	<ItemGroup>
 		<Resource Include="Resources\Add.ico" />
 		<Resource Include="Resources\Close.ico" />
 		<Resource Include="Resources\Delete.ico" />

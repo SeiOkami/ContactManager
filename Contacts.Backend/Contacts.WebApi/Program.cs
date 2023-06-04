@@ -15,6 +15,7 @@ using Microsoft.Extensions.Options;
 using Swashbuckle.AspNetCore.SwaggerGen;
 using Microsoft.AspNetCore.Mvc.ApiExplorer;
 using Polly;
+using Contacts.Shared.LaunchManager;
 
 namespace Contacts.WebApi
 
@@ -27,20 +28,13 @@ namespace Contacts.WebApi
 
             var identityUrl = Configuration.IdentityServerUrl;
 
-            Policy.Handle<Exception>()
-                .WaitAndRetryAsync(
-                    retryCount: 20,
-                    sleepDurationProvider: retryAttempt => TimeSpan.FromSeconds(1),
-                    onRetry: (exception, retryCount) =>
-                    {
-                        Console.WriteLine($"Retry {retryCount} due to {exception.Message}");
-                    })
-                .ExecuteAsync(async () =>
-                {
-                    using var client = new HttpClient();
-                    var response = await client.GetAsync(identityUrl);
-                    response.EnsureSuccessStatusCode();
-                }).Wait();
+            LaunchManagerOptions launchManagerOptions = new() 
+            {
+                ExpectedAddress = identityUrl
+            };
+
+            var launch = new LaunchManager(launchManagerOptions);
+            launch.OnStart();
 
             var builder = WebApplication.CreateBuilder(args);
             builder.Host.UseSerilog();
