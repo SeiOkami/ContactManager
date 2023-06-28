@@ -1,4 +1,5 @@
 ﻿using Contacts.WebClient.Models;
+using Contacts.Shared.Models;
 using Contacts.WebClient.Services;
 using IdentityModel.Client;
 using Microsoft.AspNetCore.Authentication;
@@ -7,20 +8,20 @@ using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System.Text;
+using Contacts.Shared.Services;
+using Contacts.WebClient.Extensions;
 
 namespace Contacts.WebClient.Controllers
 {
     public class ContactsController : BaseController
     {
 
-        private readonly ITokenService _tokenService;
         private readonly IWebAPIService _webAPI;
         private readonly ILogger<HomeController> _logger;
 
-        public ContactsController(ITokenService tokenService, ILogger<HomeController> logger, IWebAPIService webAPI)
+        public ContactsController(ILogger<HomeController> logger, IWebAPIService webAPI)
         {
             _logger = logger;
-            _tokenService = tokenService;
             _webAPI = webAPI;
         }
 
@@ -34,12 +35,14 @@ namespace Contacts.WebClient.Controllers
                 if (userId == null || !IsAdmin)
                     userId = UserId;
 
-                var contacts = await _webAPI.ListContacts(HttpContext, userId);
+                var token = await HttpContext.GetTokenAsync();
+
+                var contacts = await _webAPI.ListContactsAsync(token, userId);
 
                 if (contacts != null)
                 {
                     contacts.IsThisUser = (userId == UserId);
-                    contacts.User = await _webAPI.GetUser(HttpContext, (Guid)userId);
+                    contacts.User = await _webAPI.GetUserAsync(token, (Guid)userId);
                 }
 
                 return View(contacts);
@@ -53,7 +56,8 @@ namespace Contacts.WebClient.Controllers
         [Authorize]
         public async Task<FileStreamResult> Export()
         {
-            var fileStream = await _webAPI.ExportContacts(HttpContext);
+            var token = await HttpContext.GetTokenAsync();
+            var fileStream = await _webAPI.ExportContactsAsync(token);
             return File(fileStream, "application/json", "contacts.json");
         }
         
@@ -71,11 +75,8 @@ namespace Contacts.WebClient.Controllers
         {
             try
             {
-                if (model.Clear)
-                    await _webAPI.ClearContacts(HttpContext);
-
-                await _webAPI.ImportContacts(HttpContext, model);
-
+                var token = await HttpContext.GetTokenAsync();
+                await _webAPI.ImportContactsAsync(token, model.FileContacts);
                 return RedirectToAction(nameof(Index));
             }
             catch (Exception ex)
@@ -88,7 +89,8 @@ namespace Contacts.WebClient.Controllers
         // GET: ContactsController/Details/5
         public async Task<ActionResult> Details(Guid id)
         {
-            var contact = await _webAPI.GetContactAsync(HttpContext, id);
+            var token = await HttpContext.GetTokenAsync();
+            var contact = await _webAPI.GetContactAsync(token, id);
             if (contact == null)
                 return RedirectToAction(nameof(Index));
             else
@@ -110,7 +112,8 @@ namespace Contacts.WebClient.Controllers
         {
             try
             {
-                await _webAPI.CreateContact(HttpContext, contact);
+                var token = await HttpContext.GetTokenAsync();
+                await _webAPI.CreateContactAsync(token, contact);
                 return RedirectToAction(nameof(Index));
             }
             catch (Exception ex)
@@ -124,7 +127,8 @@ namespace Contacts.WebClient.Controllers
         [Authorize]
         public async Task<ActionResult> Edit(Guid id)
         {
-            var contact = await _webAPI.GetContactAsync(HttpContext, id);
+            var token = await HttpContext.GetTokenAsync();
+            var contact = await _webAPI.GetContactAsync(token, id);
             if (contact == null)
                 return RedirectToAction(nameof(Index));
             else
@@ -139,7 +143,8 @@ namespace Contacts.WebClient.Controllers
         {
             try
             {
-                await _webAPI.UpdateContact(HttpContext, contact);
+                var token = await HttpContext.GetTokenAsync();
+                await _webAPI.UpdateContactAsync(token, contact);
                 return RedirectToAction(nameof(Index));
             }
             catch (Exception ex)
@@ -153,7 +158,8 @@ namespace Contacts.WebClient.Controllers
         [Authorize]
         public async Task<ActionResult> Delete(Guid id)
         {
-            var contact = await _webAPI.GetContactAsync(HttpContext, id);
+            var token = await HttpContext.GetTokenAsync();
+            var contact = await _webAPI.GetContactAsync(token, id);
             if (contact == null)
                 return RedirectToAction(nameof(Index));
             else
@@ -168,7 +174,8 @@ namespace Contacts.WebClient.Controllers
         {
             try
             {
-                await _webAPI.DeleteContact(HttpContext, id);
+                var token = await HttpContext.GetTokenAsync();
+                await _webAPI.DeleteContactAsync(token, id);
                 return RedirectToAction(nameof(Index));
             }
             catch (Exception ex)
@@ -193,7 +200,8 @@ namespace Contacts.WebClient.Controllers
         {
             try
             {
-                await _webAPI.ClearContacts(HttpContext);
+                var token = await HttpContext.GetTokenAsync();
+                await _webAPI.ClearContactsAsync(token);
                 return RedirectToAction(nameof(Index));
             }
             catch (Exception ex)
@@ -218,10 +226,8 @@ namespace Contacts.WebClient.Controllers
         {
             try
             {
-                if (model.Clear)
-                    await _webAPI.ClearContacts(HttpContext);
-
-                await _webAPI.GenerateContacts(HttpContext);
+                var token = await HttpContext.GetTokenAsync();
+                await _webAPI.GenerateContactsAsync(token, model.Clear);
                 return RedirectToAction(nameof(Index));
             }
             catch (Exception ex)

@@ -1,8 +1,6 @@
-﻿using System;
+﻿namespace Contacts.Shared.Settings;
 
-namespace Contacts.DesctopClient.Identity;
-
-public class WebAPISettings
+public class SettingsModelApi
 {
     public string MainURL { get; set; } = String.Empty;
 
@@ -27,5 +25,4 @@ public class WebAPISettings
     public string ImportContactsMethodURL { get => MainURL + ImportContactsMethodName; }
     public string ListUsersMethodURL { get => MainURL + ListUsersMethodName; }
     public string GetUserMethodURL { get => MainURL + GetUserMethodName; }
-
 }

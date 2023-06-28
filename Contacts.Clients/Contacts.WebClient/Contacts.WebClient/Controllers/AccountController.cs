@@ -6,7 +6,6 @@ namespace Contacts.WebClient.Controllers
 {
     public class AccountController : Controller
     {
-
         
         /// <summary>
         /// Show logout page
