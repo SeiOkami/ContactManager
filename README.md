@@ -4,6 +4,7 @@
 * Функция импорта и экспорта в файл
 * Возможность генерации тестовых контактов
 * Веб и десктоп приложение
+* Админ имеет возможность просмотра данных пользователей
 
 # Из чего сделано?
 
@@ -20,16 +21,11 @@
 
 # Как запустить?
 
-* Открыть solution Contacts.Identity\Contacts.Identity.sln 
-* Запустить project Contacts.Identity 
-* Открыть solution Contacts.Backend\BestContactManager.Backend.sln 
-* Запустить project Contacts.WebApi 
-* Открыть solution Contacts.Clients\Contacts.Clients.sln 
-* Запустить project Contacts.WebClient 
-* Запустить project Contacts.DesctopClient 
+* Открыть [Contacts.sln](Contacts.sln)
+* Выполнить мультизапуск проектов
 
 Все базы самостоятельно создаются. Сервер идентификации при старте имеет пользователей:
-
+admin: admin
 alice : Pass123$
 bob : Pass123$
 
