@@ -51,7 +51,7 @@
             <TextBlock Grid.Row="0" Grid.Column="0" Text="First Name"/>
             <TextBox Grid.Row="0" Grid.Column="1">
                 <TextBox.Text>
-                    <Binding Path="FirstName">
+                    <Binding Path="FirstNameView">
                         <Binding.ValidationRules>
                             <DataErrorValidationRule />
                         </Binding.ValidationRules>
@@ -62,7 +62,7 @@
             <TextBlock Grid.Row="1" Grid.Column="0" Text="Middle Name"/>
             <TextBox Grid.Row="1" Grid.Column="1">
                 <TextBox.Text>
-                    <Binding Path="MiddleName">
+                    <Binding Path="MiddleNameView">
                         <Binding.ValidationRules>
                             <DataErrorValidationRule />
                         </Binding.ValidationRules>
@@ -73,7 +73,7 @@
             <TextBlock Grid.Row="2" Grid.Column="0" Text="Last Name"/>
             <TextBox Grid.Row="2" Grid.Column="1">
                 <TextBox.Text>
-                    <Binding Path="LastName">
+                    <Binding Path="LastNameView">
                         <Binding.ValidationRules>
                             <DataErrorValidationRule />
                         </Binding.ValidationRules>
@@ -84,7 +84,7 @@
             <TextBlock Grid.Row="3" Grid.Column="0" Text="Phone"/>
             <TextBox Grid.Row="3" Grid.Column="1">
                 <TextBox.Text>
-                    <Binding Path="Phone">
+                    <Binding Path="PhoneView">
                         <Binding.ValidationRules>
                             <DataErrorValidationRule />
                         </Binding.ValidationRules>
@@ -95,7 +95,7 @@
             <TextBlock Grid.Row="4" Grid.Column="0" Text="Email"/>
             <TextBox Grid.Row="4" Grid.Column="1">
                 <TextBox.Text>
-                    <Binding Path="Email">
+                    <Binding Path="EmailView">
                         <Binding.ValidationRules>
                             <DataErrorValidationRule />
                         </Binding.ValidationRules>
@@ -105,7 +105,7 @@
 
             <TextBox Grid.Row="5" Grid.Column="0" Grid.ColumnSpan="2">
                 <TextBox.Text>
-                    <Binding Path="Description">
+                    <Binding Path="DescriptionView">
                         <Binding.ValidationRules>
                             <DataErrorValidationRule/>
                         </Binding.ValidationRules>

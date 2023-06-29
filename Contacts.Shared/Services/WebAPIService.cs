@@ -23,8 +23,8 @@ public class WebAPIService : IWebAPIService
 
         return httpClient;
     }
-    
-    public async Task<ContactsModel?> ListContactsAsync(string token, Guid? userID)
+
+    public async Task<T?> ListContactsAsync<T>(string token, Guid? userID)
     {
         using var httpClient = NewHttpClient(token);
 
@@ -34,10 +34,13 @@ public class WebAPIService : IWebAPIService
 
         var result = await httpClient.GetAsync(fullPath);
         if (result.IsSuccessStatusCode)
-            return (ContactsModel?)(await result.Content.ReadFromJsonAsync(typeof(ContactsModel)));
+            return (T?)(await result.Content.ReadFromJsonAsync(typeof(T)));
         else
             throw new Exception(result.ToString());
     }
+
+    public async Task<ContactsModel?> ListContactsAsync(string token, Guid? userID)
+        => await ListContactsAsync<ContactsModel>(token, userID);
 
     public async Task<Stream> ExportContactsAsync(string token)
     {
@@ -54,7 +57,10 @@ public class WebAPIService : IWebAPIService
         }
     }
 
-    public async Task CreateContactAsync(string token, ContactModel contact)
+    public async Task<Guid?> CreateContactAsync(string token, ContactModel contact)
+        => await CreateContactAsync<ContactModel>(token, contact);
+
+    public async Task<Guid?> CreateContactAsync<T>(string token, T contact)
     {
         using var httpClient = NewHttpClient(token);
         
@@ -62,11 +68,17 @@ public class WebAPIService : IWebAPIService
         var data = new StringContent(json, Encoding.UTF8, "application/json");
         var result = await httpClient.PostAsync(settings.CreateContactMethodURL, data);
 
-        if (!result.IsSuccessStatusCode)
+        if (result.IsSuccessStatusCode)
+            return (Guid?)(await result.Content.ReadFromJsonAsync(typeof(Guid)));
+        else
             throw new Exception(result.ToString());
+        
     }
 
     public async Task UpdateContactAsync(string token, ContactModel contact)
+        => await UpdateContactAsync<ContactModel>(token, contact);
+
+    public async Task UpdateContactAsync<T>(string token, T contact)
     {
         using var httpClient = NewHttpClient(token);
 
@@ -81,6 +93,9 @@ public class WebAPIService : IWebAPIService
     }
 
     public async Task<ContactModel?> GetContactAsync(string token, Guid ID)
+        => await GetContactAsync<ContactModel>(token, ID);
+
+    public async Task<T?> GetContactAsync<T>(string token, Guid ID)
     {
         using var httpClient = NewHttpClient(token);
 
@@ -88,7 +103,7 @@ public class WebAPIService : IWebAPIService
 
         var result = await httpClient.GetAsync(fullURL);
         if (result.IsSuccessStatusCode)
-            return (ContactModel?)(await result.Content.ReadFromJsonAsync(typeof(ContactModel)));
+            return (T?)(await result.Content.ReadFromJsonAsync(typeof(T)));
         else
             throw new Exception(result.ToString());
     }

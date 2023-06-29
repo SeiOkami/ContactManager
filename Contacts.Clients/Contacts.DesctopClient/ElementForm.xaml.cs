@@ -1,25 +1,15 @@
-﻿using Contacts.DesctopClient.Models;
+﻿using Contacts.DesctopClient.ViewModels;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
 using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Shapes;
 
 namespace Contacts.DesctopClient
 {
-    
+
     public partial class ElementForm : Window
     {
 
-        private ContactModel element;
+        private ContactViewModel element;
 
         private bool isCorrect
         {
@@ -29,7 +19,7 @@ namespace Contacts.DesctopClient
             }
         }
         
-        public ElementForm(ContactModel element)
+        public ElementForm(ContactViewModel element)
         {
             InitializeComponent();
 

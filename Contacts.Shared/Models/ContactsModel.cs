@@ -1,5 +1,4 @@
-﻿using System.Collections;
-namespace Contacts.Shared.Models;
+﻿namespace Contacts.Shared.Models;
 
 public class ContactsModel
 {

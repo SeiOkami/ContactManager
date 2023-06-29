@@ -1,33 +1,28 @@
-﻿using Contacts.DesctopClient.Models;
-using IdentityModel.OidcClient;
-using Microsoft.Extensions.Configuration;
-using Newtonsoft.Json;
+﻿using IdentityModel.OidcClient;
 using System;
 using System.IO;
-using System.Net.Http;
-using System.Net.Http.Json;
-using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
-using System.Threading;
-using System.Linq;
-using System.Security.Claims;
-using System.Windows.Documents;
 using System.Collections.Generic;
 using Contacts.Shared.Settings;
+using Contacts.Shared.Services;
+using Contacts.Shared.Models;
+using Contacts.DesctopClient.ViewModels;
+using System.Net.Http;
 
 namespace Contacts.DesctopClient.Identity;
 
-public class WebAPI : Contacts.Shared.Services.WebAPIService
+public class WebAPI
 {
 
     private OidcClient oidcClient;
 
     public IdentityUserModel User;
+    private string token => User.Token ?? "";
 
     private readonly string userCancelKeyError = "UserCancel";
     private readonly string accessDeniedKeyError = "access_denied";
-    private readonly SettingsModelApi settings;
+    private readonly IWebAPIService webApi;
 
     public WebAPI()
     {
@@ -37,7 +32,7 @@ public class WebAPI : Contacts.Shared.Services.WebAPIService
 
         User.IsAuthenticated = !String.IsNullOrEmpty(User.Token);
 
-        settings = SettingsManager.Settings.WebAPI;
+        webApi = new WebAPIService();
 
         var options = new OidcClientOptions()
         {
@@ -55,34 +50,9 @@ public class WebAPI : Contacts.Shared.Services.WebAPIService
 
     public async Task LoginAsync()
     {
+        await LoginOnStart();
         if (User.IsAuthenticated)
-        {
-            var userInfo = await oidcClient.GetUserInfoAsync(User.Token);
-            if (userInfo.IsError)
-            {
-                User.IsAuthenticated = false;
-            } else
-            {
-                foreach (var claim in userInfo.Claims)
-                {
-                    if (claim.Type == "sub")
-                    {
-                        Guid id1 = Guid.NewGuid();
-                        if (claim != null)
-                            if (Guid.TryParse(claim.Value, out id1))
-                                User.Id = id1;
-                    }
-                    else if (claim.Type == "role" && claim.Value == "Admin")
-                    {
-                        User.IsAdmin = true;
-                    }
-                }
-
-                return;
-            }
-            
-        }
-           
+            return;
 
         User.InProcessAuthenticated = true;
 
@@ -121,137 +91,32 @@ public class WebAPI : Contacts.Shared.Services.WebAPIService
         User.InProcessAuthenticated = false;
     }
 
-    public async Task<List<UserModel>?> ListUsersAsync()
+    private async Task LoginOnStart()
     {
-        using var httpClient = new HttpClientAPI(User.Token);
-
-        var response = await httpClient.GetAsync(settings.ListUsersMethodURL);
-
-        if (response.IsSuccessStatusCode)
-            return (List<UserModel>?)(await response.Content.ReadFromJsonAsync(typeof(List<UserModel>)));
-
-        HandleResponseError(response);
-        return null;
-
-    }
-
-    public async Task<ContactsModel?> ListContactsAsync(Guid UserId)
-    {
-        using var httpClient = new HttpClientAPI(User.Token);
-
-        var fullURL = $"{settings.ListContactsMethodURL}/{UserId}";
-        var response = await httpClient.GetAsync(fullURL);
-
-        if (response.IsSuccessStatusCode)
-            return (ContactsModel?)(await response.Content.ReadFromJsonAsync(typeof(ContactsModel)));
-
-        HandleResponseError(response);
-        return null;
-
-    }
-
-    public async Task<ContactModel?> GetContactAsync(Guid ID)
-    {
-        using var httpClient = new HttpClientAPI(User.Token);
-
-        var fullURL = $"{settings.DetailsContactMethodURL}/{ID}";
-
-        var response = await httpClient.GetAsync(fullURL);
-        if (response.IsSuccessStatusCode)
-            return (ContactModel?)(await response.Content.ReadFromJsonAsync(typeof(ContactModel)));
-
-        HandleResponseError(response);
-        return null;
-    }
-
-    public async Task UpdateContact(ContactModel contact)
-    {
-        using var httpClient = new HttpClientAPI(User.Token);
-
-        var fullURL = settings.UpdateContactMethodURL;
-
-        var json = JsonConvert.SerializeObject(contact);
-        var data = new StringContent(json, Encoding.UTF8, "application/json");
-        var response = await httpClient.PutAsync(fullURL, data);
-
-        if (!response.IsSuccessStatusCode)
-            HandleResponseError(response);
-    }
-
-    public async Task<Guid?> CreateContactAsync(ContactModel contact)
-    {
-        using var httpClient = new HttpClientAPI(User.Token);
-
-        var json = JsonConvert.SerializeObject(contact);
-        var data = new StringContent(json, Encoding.UTF8, "application/json");
-        var response = await httpClient.PostAsync(settings.CreateContactMethodURL, data);
-
-        if (response.IsSuccessStatusCode)
-            return (Guid?)(await response.Content.ReadFromJsonAsync(typeof(Guid?)));
-
-        HandleResponseError(response);
-        return null;
-    }
-
-    public async Task<bool> DeleteContactAsync(Guid ID)
-    {
-        using var httpClient = new HttpClientAPI(User.Token);
-
-        var fullURL = $"{settings.DeleteContactMethodURL}/{ID}";
-
-        var response = await httpClient.DeleteAsync(fullURL);
-
-        if (response.IsSuccessStatusCode)
-            return true;
-
-        HandleResponseError(response);
-        return false;
-    }
-
-    public async Task<Stream?> ExportContacts()
-    {
-        using var httpClient = new HttpClientAPI(User.Token);
-
-        var response = await httpClient.GetAsync(settings.ListContactsMethodURL);
-        if (response.IsSuccessStatusCode)
-            return await response.Content.ReadAsStreamAsync();
-
-        HandleResponseError(response);
-        return null;
-    }
-
-    public async Task ClearContactsAsync()
-    {
-        using var httpClient = new HttpClientAPI(User.Token);
-
-        var response = await httpClient.DeleteAsync(settings.ClearContactsMethodURL);
-        if (!response.IsSuccessStatusCode)
-            HandleResponseError(response);
-
-    }
-
-    public async Task GenerateContactsAsync()
-    {
-        using var httpClient = new HttpClientAPI(User.Token);
-
-        var response = await httpClient.PostAsync(settings.GenerateContactsMethodURL, null);
-
-        if (!response.IsSuccessStatusCode)
-            HandleResponseError(response);
-    }
-
-    public async Task ImportContacts(string data)
-    {
-
-        using var httpClient = new HttpClientAPI(User.Token);
-
-        var content = new StringContent(data, Encoding.UTF8, "application/json");
-
-        var response = await httpClient.PostAsync(settings.ImportContactsMethodURL, content);
-
-        if (!response.IsSuccessStatusCode)
-            HandleResponseError(response);
-
+        if (!User.IsAuthenticated)
+            return;
+        
+        var userInfo = await oidcClient.GetUserInfoAsync(User.Token);
+        if (userInfo.IsError)
+        {
+            User.IsAuthenticated = false;
+            return;
+        }
+        
+        foreach (var claim in userInfo.Claims)
+        {
+            if (claim.Type == "sub")
+            {
+                Guid id1 = Guid.NewGuid();
+                if (claim != null)
+                    if (Guid.TryParse(claim.Value, out id1))
+                        User.Id = id1;
+            }
+            else if (claim.Type == "role" && claim.Value == "Admin")
+            {
+                User.IsAdmin = true;
+            }
+        }
     }
 
     public void Logout()
@@ -262,12 +127,99 @@ public class WebAPI : Contacts.Shared.Services.WebAPIService
         User.Name = String.Empty;
     }
 
-    public void HandleResponseError(HttpResponseMessage response)
+    public async Task<List<UserInfoModel>?> ListUsersAsync()
     {
-        if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized)
-            Logout();
-        else
-            MessageBox.Show(response.StatusCode.ToString());
+        try
+        {
+            return await webApi.ListUsersAsync(token);
+        }
+        catch (Exception ex)
+        {
+            ShowError(ex);
+            return null;
+        }
+    }
+
+    public async Task<ContactsViewModel?> ListContactsAsync(Guid UserId)
+    {
+        try
+        {
+            return await webApi.ListContactsAsync<ContactsViewModel>(token, UserId);
+        }
+        catch (Exception ex)
+        {
+            ShowError(ex);
+            return null;
+        }
+    }
+
+    public async Task<ContactViewModel?> GetContactAsync(Guid ID)
+    {
+        try
+        {
+            return await webApi.GetContactAsync<ContactViewModel>(token, ID);
+        }
+        catch (Exception ex)
+        {
+            ShowError(ex);
+            return null;
+        }
+    }
+
+    public async Task UpdateContactAsync(ContactViewModel contact)
+    {
+        try
+        {
+            await webApi.UpdateContactAsync<ContactViewModel>(token, contact);
+        }
+        catch (Exception ex)
+        {
+            ShowError(ex);
+        }
+    }
+
+    public async Task<Guid?> CreateContactAsync(ContactModel contact)
+    {
+        try
+        {
+            return await webApi.CreateContactAsync<ContactModel>(token, contact);
+        }
+        catch (Exception ex)
+        {
+            ShowError(ex);
+            return null;
+        }
+    }
+
+    public async Task<bool> DeleteContactAsync(Guid ID)
+    {
+        try
+        {
+            await webApi.DeleteContactAsync(token, ID);
+            return true;
+        }
+        catch (Exception ex)
+        {
+            ShowError(ex);
+            return false;
+        }
+    }
+
+    public async Task<Stream?> ExportContactsAsync()
+        => await webApi.ExportContactsAsync(token);
+
+    public async Task ClearContactsAsync()
+        => await webApi.ClearContactsAsync(token);
+
+    public async Task GenerateContactsAsync()
+        => await webApi.GenerateContactsAsync(token);
+
+    public async Task ImportContactsAsync(string data)
+        => await webApi.ImportContactsAsync(token, data, false);
+    
+    private void ShowError(Exception ex)
+    {
+        MessageBox.Show(ex.Message);
     }
 
 }

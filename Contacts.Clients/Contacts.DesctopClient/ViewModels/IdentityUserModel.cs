@@ -1,12 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.ComponentModel;
-using System.Linq;
 using System.Runtime.CompilerServices;
-using System.Text;
-using System.Threading.Tasks;
 
-namespace Contacts.DesctopClient.Models
+namespace Contacts.DesctopClient.ViewModels
 {
     public class IdentityUserModel : INotifyPropertyChanged
     {
@@ -20,7 +16,7 @@ namespace Contacts.DesctopClient.Models
         public string? Name
         {
             get { return name; }
-            set
+            set  
             {
                 name = value;
                 Properties.Settings.Default.UserName = name;

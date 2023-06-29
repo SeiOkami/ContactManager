@@ -5,72 +5,72 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 
-namespace Contacts.DesctopClient.Identity
+namespace Contacts.DesctopClient.Identity;
+
+public class IdentityBrowser : IBrowser
 {
-    public class IdentityBrowser : IBrowser
+    private BrowserOptions? _options;
+
+    public async Task<BrowserResult> InvokeAsync(
+        BrowserOptions options, CancellationToken cancellationToken = default)
     {
-        private BrowserOptions? _options;
+        _options = options;
 
-        public async Task<BrowserResult> InvokeAsync(BrowserOptions options, CancellationToken cancellationToken = default)
+        var semaphoreSlim = new SemaphoreSlim(0, 1);
+        var browserResult = new BrowserResult()
         {
-            _options = options;
+            ResultType = BrowserResultType.UserCancel
+        };
 
-            var semaphoreSlim = new SemaphoreSlim(0, 1);
-            var browserResult = new BrowserResult()
-            {
-                ResultType = BrowserResultType.UserCancel
-            };
+        var signinWindow = new Window()
+        {
+            Width = 560,
+            Height = 890,
+            Title = "Sign In",
+            WindowStartupLocation = WindowStartupLocation.CenterScreen
+        };
+        signinWindow.Closing += (s, e) =>
+        {
+            semaphoreSlim.Release();
+        };
 
-            var signinWindow = new Window()
+        var webView = new WebView2();
+        webView.NavigationStarting += (s, e) =>
+        {
+            if (IsBrowserNavigatingToRedirectUri(new Uri(e.Uri)))
             {
-                Width = 560,
-                Height = 890,
-                Title = "Sign In",
-                WindowStartupLocation = WindowStartupLocation.CenterScreen
-            };
-            signinWindow.Closing += (s, e) =>
-            {
-                semaphoreSlim.Release();
-            };
+                e.Cancel = true;
 
-            var webView = new WebView2();
-            webView.NavigationStarting += (s, e) =>
-            {
-                if (IsBrowserNavigatingToRedirectUri(new Uri(e.Uri)))
+                browserResult = new BrowserResult()
                 {
-                    e.Cancel = true;
+                    ResultType = BrowserResultType.Success,
+                    Response = new Uri(e.Uri).AbsoluteUri
+                };
 
-                    browserResult = new BrowserResult()
-                    {
-                        ResultType = BrowserResultType.Success,
-                        Response = new Uri(e.Uri).AbsoluteUri
-                    };
+                semaphoreSlim.Release();
+                signinWindow.Close();
+            }
+        };
 
-                    semaphoreSlim.Release();
-                    signinWindow.Close();
-                }
-            };
+        signinWindow.Content = webView;
+        signinWindow.Show();
 
-            signinWindow.Content = webView;
-            signinWindow.Show();
+        // Initialization
+        await webView.EnsureCoreWebView2Async(null);
 
-            // Initialization
-            await webView.EnsureCoreWebView2Async(null);
+        // Delete existing Cookies so previous logins won't remembered
+        webView.CoreWebView2.CookieManager.DeleteAllCookies();
 
-            // Delete existing Cookies so previous logins won't remembered
-            webView.CoreWebView2.CookieManager.DeleteAllCookies();
+        // Navigate
+        webView.CoreWebView2.Navigate(_options.StartUrl);
 
-            // Navigate
-            webView.CoreWebView2.Navigate(_options.StartUrl);
+        await semaphoreSlim.WaitAsync();
 
-            await semaphoreSlim.WaitAsync();
+        return browserResult;
+    }
 
-            return browserResult;
-        }
-
-        private bool IsBrowserNavigatingToRedirectUri(Uri uri)
-        {
-            return _options != null && uri.AbsoluteUri.StartsWith(_options.EndUrl);
-        }
+    private bool IsBrowserNavigatingToRedirectUri(Uri uri)
+    {
+        return _options != null && uri.AbsoluteUri.StartsWith(_options.EndUrl);
     }
 }
