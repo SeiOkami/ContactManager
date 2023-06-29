@@ -26,14 +26,13 @@ namespace Contacts.WebApi
         public static void Main(string[] args)
         {
 
-            var identityUrl = Configuration.IdentityServerUrl;
+            var sharedSettings = Contacts.Shared.Settings.SettingsManager.Settings;
+            var identityUrl = sharedSettings.Identity.MainURL;
 
-            LaunchManagerOptions launchManagerOptions = new() 
+            var launch = new LaunchManager(new()
             {
-                ExpectedAddress = identityUrl
-            };
-
-            var launch = new LaunchManager(launchManagerOptions);
+                ExpectedAddress = identityUrl,
+            });
             launch.OnStart();
 
             var builder = WebApplication.CreateBuilder(args);
@@ -43,7 +42,7 @@ namespace Contacts.WebApi
 
             services.AddHttpClient("IdentityServer", client =>
             {
-                client.BaseAddress = new Uri(Configuration.IdentityServerUrl);
+                client.BaseAddress = new Uri(identityUrl);
             });
 
             services.AddHttpClient<IdentityServerService>("IdentityServer");
@@ -74,7 +73,7 @@ namespace Contacts.WebApi
                 config.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
             }).AddJwtBearer("Bearer", options =>
             {
-                options.Authority = Configuration.IdentityServerUrl;
+                options.Authority = identityUrl;
                 options.Audience = "ContactsWebAPI";
                 options.RequireHttpsMetadata = false;
             });

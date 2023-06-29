@@ -210,27 +210,27 @@
                     <DataGrid.Columns>
 
                         <DataGridTextColumn x:Name="FirstName" 
-                                    Binding="{Binding FirstName}" 
+                                    Binding="{Binding FirstNameView}" 
                                     Header="First Name"/>
 
                         <DataGridTextColumn x:Name="MiddleName" 
-                                    Binding="{Binding MiddleName}" 
+                                    Binding="{Binding MiddleNameView}" 
                                     Header="Middle Name"/>
 
                         <DataGridTextColumn x:Name="LastName" 
-                                    Binding="{Binding LastName}" 
+                                    Binding="{Binding LastNameView}" 
                                     Header="Last Name"/>
 
                         <DataGridTextColumn x:Name="Phone" 
-                                    Binding="{Binding Phone}" 
+                                    Binding="{Binding PhoneView}" 
                                     Header="Phone"/>
 
                         <DataGridTextColumn x:Name="Email"
-                                    Binding="{Binding Email}" 
+                                    Binding="{Binding EmailView}" 
                                     Header="Email"/>
 
                         <DataGridTextColumn x:Name="Description"
-                                    Binding="{Binding Description}" 
+                                    Binding="{Binding DescriptionView}" 
                                     Header="Description"/>
 
                     </DataGrid.Columns>

@@ -1,9 +1,7 @@
 ﻿using Contacts.WebApi.Models;
 using Contacts.WebApi.Services;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using System.Data;
 
 namespace Contacts.WebApi.Controllers
 {
@@ -20,7 +18,7 @@ namespace Contacts.WebApi.Controllers
         }
 
         [HttpGet("GetAll")]
-        [Authorize(Roles = Configuration.RoleNameAdmin)]
+        [Authorize(Roles = Shared.Identity.Roles.Admin)]
         public async Task<ActionResult<IEnumerable<IdentityUserInfo>>> GetAll()
         {
             var users = await _identityServer.GetUsersAsync();

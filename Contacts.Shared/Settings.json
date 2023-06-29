@@ -1,0 +1,18 @@
+{
+  "WebAPI": {
+    "MainURL": "https://localhost:7058/",
+    "ListContactsMethodName": "api/Contacts/GetAll",
+    "DetailsContactMethodName": "api/Contacts/Get",
+    "CreateContactMethodName": "api/Contacts/Create",
+    "UpdateContactMethodName": "api/Contacts/Update",
+    "DeleteContactMethodName": "api/Contacts/Delete",
+    "ClearContactsMethodName": "api/Contacts/Clear",
+    "ImportContactsMethodName": "api/Contacts/Import",
+    "GenerateContactsMethodName": "api/Contacts/Generate",
+    "ListUsersMethodName": "api/Users/GetAll",
+    "GetUserMethodName": "api/Users/Get"
+  },
+  "Identity": {
+    "MainURL": "https://localhost:7251"
+  }
+}

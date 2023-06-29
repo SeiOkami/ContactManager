@@ -77,7 +77,7 @@ namespace Contacts.WebClient.Extensions
         [DebuggerStepThrough]
         public static bool IsAdmin(this ClaimsPrincipal principal)
         {
-            return principal?.IsInRole(Configuration.RoleAdmin) ?? false;
+            return principal?.IsInRole(Shared.Identity.Roles.Admin) ?? false;
         }
 
         //

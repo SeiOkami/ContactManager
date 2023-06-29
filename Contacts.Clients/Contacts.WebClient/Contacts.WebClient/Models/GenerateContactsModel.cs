@@ -1,10 +1,9 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace Contacts.WebClient.Models
+namespace Contacts.WebClient.Models;
+
+public class GenerateContactsModel
 {
-    public class GenerateContactsModel
-    {
-        [Display(Name = "Clear database?")]
-        public bool Clear { get; set; }
-    }
+    [Display(Name = "Clear database?")]
+    public bool Clear { get; set; }
 }

@@ -1,19 +1,14 @@
-using Contacts.WebClient.Services;
-using Microsoft.AspNetCore.Authentication.Cookies;
-using System.IdentityModel.Tokens.Jwt;
 using Contacts.WebClient;
-using System.Security.Claims;
-using Polly;
 using Contacts.Shared.LaunchManager;
+using Contacts.Shared.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
-LaunchManagerOptions launchManagerOptions = new()
+var sharedSettings = Contacts.Shared.Settings.SettingsManager.Settings;
+var launch = new LaunchManager(new()
 {
-    ExpectedAddress = "https://localhost:7058/"
-};
-
-var launch = new LaunchManager(launchManagerOptions);
+    ExpectedAddress = sharedSettings.WebAPI.MainURL,
+});
 launch.OnStart();
 
 var services = builder.Services;
@@ -43,9 +38,7 @@ services.AddAuthentication(options =>
 
     });
 
-services.AddSingleton<ITokenService, TokenService>();
 services.AddSingleton<IWebAPIService, WebAPIService>();
-services.Configure<WebAPIServiceSettings>(configuration.GetSection("SettingsWebAPI"));
 
 
 var app = builder.Build();

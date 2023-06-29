@@ -1,6 +1,6 @@
-﻿namespace Contacts.WebClient.Models;
+﻿namespace Contacts.Shared.Models;
 
-public class UserModel
+public class UserInfoModel
 {
     public Guid Id { get; set; }
     public string Name { get; set; } = "";

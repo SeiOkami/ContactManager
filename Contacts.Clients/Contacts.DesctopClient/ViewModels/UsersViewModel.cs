@@ -1,19 +1,15 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
-using System.Linq;
 using System.Runtime.CompilerServices;
-using System.Text;
-using System.Threading.Tasks;
-using Contacts.DesctopClient.Models;
+using Contacts.Shared.Models;
 
 namespace Contacts.DesctopClient.ViewModels;
 
 public class UsersViewModel : INotifyPropertyChanged
 {
-    private ObservableCollection<UserModel> users;
-    public ObservableCollection<UserModel> Users
+    private ObservableCollection<UserInfoModel> users;
+    public ObservableCollection<UserInfoModel> Users
     {
         get { return users; }
         set
@@ -33,7 +29,7 @@ public class UsersViewModel : INotifyPropertyChanged
             PropertyChanged(this, new PropertyChangedEventArgs(prop));
     }
 
-    public UsersViewModel(ApplicationViewModel appModel, List<UserModel> users)
+    public UsersViewModel(ApplicationViewModel appModel, List<UserInfoModel> users)
     {
         this.AppModel = appModel;
         this.users = new(users);

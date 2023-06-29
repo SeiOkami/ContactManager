@@ -51,31 +51,6 @@ namespace Contacts.WebApi.Controllers
         }
 
         /// <summary>
-        /// Gets the list of contacts
-        /// </summary>
-        /// <remarks>
-        /// Sample request:
-        /// GET /contact
-        /// </remarks>
-        /// <param name="userID">user ID (guid)</param>
-        /// <returns>
-        /// Returns ContactListVm
-        /// </returns>
-        /// <response code="200">Success</response>
-        /// <response code="401">If the user is unauthorized</response>
-        //[HttpGet]
-        //[Authorize(Roles = Configuration.RoleNameAdmin)]
-        //public async Task<ActionResult<ContactListVm>> GetAll1(Guid userID)
-        //{
-        //    var query = new GetContactListQuery
-        //    {
-        //        UserId = UserId
-        //    };
-        //    var vm = await Mediator.Send(query);
-        //    return Ok(vm);
-        //}
-
-        /// <summary>
         /// Gets the contact by id
         /// </summary>
         /// <remarks>
