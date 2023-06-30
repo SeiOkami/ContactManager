@@ -1,10 +1,11 @@
 using Contacts.WebClient;
 using Contacts.Shared.LaunchManager;
 using Contacts.Shared.Services;
+using Contacts.Shared.Settings;
 
 var builder = WebApplication.CreateBuilder(args);
 
-var sharedSettings = Contacts.Shared.Settings.SettingsManager.Settings;
+var sharedSettings = SettingsManager.Settings;
 var launch = new LaunchManager(new()
 {
     ExpectedAddress = sharedSettings.WebAPI.MainURL,
@@ -25,7 +26,7 @@ services.AddAuthentication(options =>
     .AddOpenIdConnect("oidc", options =>
     {
 
-        options.Authority = configuration["InteractiveServiceSettings:AuthorityUrl"];
+        options.Authority = SettingsManager.Settings.Identity.MainURL;
         options.ClientId = Configuration.ClientName;
         options.ClientSecret = Configuration.SecretPassword;
 
